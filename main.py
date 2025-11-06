@@ -6,6 +6,7 @@ from screens.regions import RegionsScreen
 from screens.orders import OrdersScreen
 from screens.charts import ChartScreen
 from screens.queries import QueriesScreen
+from screens.produce import ProduceScreen
 
 apply_theme()
 
@@ -14,11 +15,11 @@ class App(ctk.CTk):
         super().__init__()
         self.role = role  # "admin" or "viewer"
         self.title("Green-Grocer Management System")
-        self.geometry("1000x650")
+        self.geometry("1100x700")
         self.configure(fg_color="#FFFFFF")
 
         # Sidebar
-        sidebar = ctk.CTkFrame(self, width=180)
+        sidebar = ctk.CTkFrame(self, width=200)
         sidebar.pack(side="left", fill="y", padx=8, pady=8)
 
         # Main container
@@ -29,6 +30,7 @@ class App(ctk.CTk):
         btns = [
             ("Farmers", self.show_farmers),
             ("Regions", self.show_regions),
+            ("Produce", self.show_produce),
             ("Orders", self.show_orders),
             ("Charts", self.show_charts),
             ("Queries", self.show_queries),
@@ -48,11 +50,13 @@ class App(ctk.CTk):
     def load_screen(self, screen_class):
         if self.current_screen:
             self.current_screen.destroy()
+        # instantiate screen with role so each screen can limit actions
         self.current_screen = screen_class(self.container, role=self.role)
         self.current_screen.pack(fill="both", expand=True)
 
     def show_farmers(self): self.load_screen(FarmersScreen)
     def show_regions(self): self.load_screen(RegionsScreen)
+    def show_produce(self): self.load_screen(ProduceScreen)
     def show_orders(self): self.load_screen(OrdersScreen)
     def show_charts(self): self.load_screen(ChartScreen)
     def show_queries(self): self.load_screen(QueriesScreen)
@@ -64,6 +68,5 @@ def run_app(role="viewer"):
 
 
 if __name__ == "__main__":
-    # Launch the login screen which will call run_app(role)
     from screens.login import LoginScreen
     LoginScreen().mainloop()

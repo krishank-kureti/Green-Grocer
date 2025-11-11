@@ -23,11 +23,13 @@ class FarmersScreen(ctk.CTkFrame):
             form = ctk.CTkFrame(self)
             form.pack(pady=6, padx=8, fill="x")
 
+            self.fid = ctk.CTkEntry(form, placeholder_text="Farmer ID")
             self.name = ctk.CTkEntry(form, placeholder_text="Name")
             self.size = ctk.CTkEntry(form, placeholder_text="Farm Size")
             self.contact = ctk.CTkEntry(form, placeholder_text="Contact")
             self.region = ctk.CTkEntry(form, placeholder_text="Region ID")
-            for w in (self.name, self.size, self.contact, self.region):
+
+            for w in (self.fid, self.name, self.size, self.contact, self.region):
                 w.pack(side="left", padx=6, pady=6, expand=True, fill="x")
 
             ctk.CTkButton(self, text="Add Farmer", command=self.add_farmer).pack(pady=6)
@@ -56,6 +58,7 @@ class FarmersScreen(ctk.CTkFrame):
 
     def add_farmer(self):
         try:
+            fid = int(self.fid.get().strip())
             name = self.name.get().strip()
             size = int(self.size.get().strip() or 0)
             contact = int(self.contact.get().strip())
@@ -63,14 +66,26 @@ class FarmersScreen(ctk.CTkFrame):
 
             conn = get_connection()
             cur = conn.cursor()
-            cur.execute("INSERT INTO Farmer (Farmer_Name, Farm_Size, Contact_Info, Region_ID) VALUES (%s,%s,%s,%s)",
-                        (name, size, contact, region))
+            cur.execute(
+                "INSERT INTO Farmer (Farmer_ID, Farmer_Name, Farm_Size, Contact_Info, Region_ID) VALUES (%s,%s,%s,%s,%s)",
+                (fid, name, size, contact, region)
+            )
             conn.commit()
             conn.close()
+
             show_success("Farmer added!")
             self.load()
+
+            # clear fields
+            self.fid.delete(0, "end")
+            self.name.delete(0, "end")
+            self.size.delete(0, "end")
+            self.contact.delete(0, "end")
+            self.region.delete(0, "end")
+
         except Exception as e:
             show_error(str(e))
+
 
     def update_record(self):
         try:

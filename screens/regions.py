@@ -21,10 +21,11 @@ class RegionsScreen(ctk.CTkFrame):
         if self.role == "admin":
             form = ctk.CTkFrame(self)
             form.pack(pady=6, padx=8, fill="x")
+            self.rid = ctk.CTkEntry(form, placeholder_text="Region ID")
             self.rname = ctk.CTkEntry(form, placeholder_text="Region Name")
             self.climate = ctk.CTkEntry(form, placeholder_text="Climate")
             self.soil = ctk.CTkEntry(form, placeholder_text="Soil Type")
-            for w in (self.rname, self.climate, self.soil):
+            for w in (self.rid, self.rname, self.climate, self.soil):
                 w.pack(side="left", padx=6, pady=6, expand=True, fill="x")
             ctk.CTkButton(self, text="Add Region", command=self.add_region).pack(pady=6)
 
@@ -52,19 +53,31 @@ class RegionsScreen(ctk.CTkFrame):
 
     def add_region(self):
         try:
+            rid = int(self.rid.get().strip())
             name = self.rname.get().strip()
             climate = self.climate.get().strip()
             soil = self.soil.get().strip()
+
             conn = get_connection()
             cur = conn.cursor()
-            cur.execute("INSERT INTO Region (Region_Name, Climate, Soil_Type) VALUES (%s,%s,%s)",
-                        (name, climate, soil))
+            cur.execute(
+                "INSERT INTO Region (Region_ID, Region_Name, Climate, Soil_Type) VALUES (%s,%s,%s,%s)",
+                (rid, name, climate, soil)
+            )
             conn.commit()
             conn.close()
             show_success("Region added")
             self.load()
+
+            # clear fields
+            self.rid.delete(0, "end")
+            self.rname.delete(0, "end")
+            self.climate.delete(0, "end")
+            self.soil.delete(0, "end")
+
         except Exception as e:
-            show_error(str(e))
+                show_error(str(e))
+
 
     def update_record(self):
         try:
